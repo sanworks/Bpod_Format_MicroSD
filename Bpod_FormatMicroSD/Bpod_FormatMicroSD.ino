@@ -43,11 +43,7 @@ uint8_t sd_eraseOK = 0;
 uint32_t sd_cardSectorCount = 0;
 
 void setup() {
-  m_card = cardFactory.newCard(SdioConfig(FIFO_SDIO));
-  sd_initOK = 1;
-  if (!m_card || m_card->errorCode()) {
-    sd_initOK = 0;
-  }
+  
 }
 
 void loop() {
@@ -55,6 +51,11 @@ void loop() {
     msg = Serial.read();
     switch(msg) {
       case 'F': // Erase and format microSD card
+        m_card = cardFactory.newCard(SdioConfig(FIFO_SDIO));
+        sd_initOK = 1;
+        if (!m_card || m_card->errorCode()) {
+          sd_initOK = 0;
+        }
         Serial.write(sd_initOK);
         if (sd_initOK){
           sd_eraseOK = eraseCard();
@@ -83,7 +84,7 @@ uint8_t eraseCard() {
     if (lastBlock >= sd_cardSectorCount) {
       lastBlock = sd_cardSectorCount - 1;
     }
-    if (!m_card->erase(firstBlock, lastBlock)) {
+    if (!m_card->erase(firstBlock, lastBlock)) { 
       eraseOK = 0;
     }
     firstBlock += ERASE_SIZE;
